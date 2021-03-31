@@ -13,9 +13,10 @@ app.config["MYSQL_DB"] = "weblogin"
 
 @app.route('/member/')
 def member():
-    return render_template("member.html", name = session["name"])
+    if "name" in session:
+        return render_template("member.html", name = session["name"])
+    return redirect('/')
 
-# TO BE SOLVED
 @app.route('/error/')
 def error():
     message = request.args.get("message")
