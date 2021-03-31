@@ -29,19 +29,17 @@ def web():
 @app.route('/signup', methods = ["GET", "POST"])
 def signup():
     if request.method == "POST":
-        if "name" in request.form and "username" in request.form and "password" in request.form:
+        if "username" in request.form:
             username = request.form["username"]
-            name = request.form["name"]
-            password = request.form["password"]
             cur = db.connection.cursor(MySQLdb.cursors.DictCursor)
-            cur.execute("SELECT * FROM weblog WHERE name = %s AND username = %s AND password = %s", (name, username, password))
+            cur.execute("SELECT * FROM weblog WHERE username = %s", (username))
             # cur.execute("SELECT * FROM weblog WHERE username = %s", (username))
             info = cur.fetchone()
-            if info and info["username"] == username:                             
+            if info is not None:                             
                 message = "帳號已被註冊"
                 return redirect(url_for("error", message = message))
             else:
-                cur.execute("INSERT INTO weblogin.weblog(name, username, password)VALUES(%s, %s, %s)", (name, username, password))
+                cur.execute("INSERT INTO weblogin.weblog(name, username, password)VALUES(%s, %s, %s)", (request.form["name"], username, request.form["password"]))
                 db.connection.commit()
                 return redirect("/")
 
