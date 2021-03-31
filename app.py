@@ -68,8 +68,7 @@ def signin():
 
 @app.route("/signout")
 def signout():
-    session.pop("username", None)
-    session.pop("password", None)
+    session.pop("name", None)
     return redirect(url_for("web"))
     
 app.run(port = 3000)
