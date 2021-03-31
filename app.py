@@ -30,19 +30,16 @@ def web():
 def signup():
     if request.method == "POST":
         if "name" in request.form and "username" in request.form and "password" in request.form:
-            name = request.form["name"]
             username = request.form["username"]
+            name = request.form["name"]
             password = request.form["password"]
             cur = db.connection.cursor(MySQLdb.cursors.DictCursor)
             cur.execute("SELECT * FROM weblog WHERE name = %s AND username = %s AND password = %s", (name, username, password))
+            # cur.execute("SELECT * FROM weblog WHERE username = %s", (username))
             info = cur.fetchone()
-            if info:
-                session["loggedin"] = True
-                session["name"] = info["name"]
-                session["username"] = info["username"]
-                session["password"] = info["password"]
-                msg = "帳號密碼已被註冊"
-                return redirect(url_for("error", msg = msg))
+            if info and info["username"] == username:                             
+                message = "帳號已被註冊"
+                return redirect(url_for("error", message = message))
             else:
                 cur.execute("INSERT INTO weblogin.weblog(name, username, password)VALUES(%s, %s, %s)", (name, username, password))
                 db.connection.commit()
@@ -60,6 +57,7 @@ def signin():
             cur.execute("SELECT * FROM weblog WHERE username = %s AND password = %s", (username, password))
             account = cur.fetchone()
             if account: 
+                session["name"] = account["name"]
                 return redirect(url_for('member', name = session["name"]))
             else: 
                 message = "帳號或密碼輸入錯誤"
